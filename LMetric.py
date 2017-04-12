@@ -1,5 +1,6 @@
 from constants import *
 from Graph import Graph
+import copy
 
 '''
 Cluster --> ID of nodes that are in the community (Union of CORE and BORDER)
@@ -86,6 +87,7 @@ class LMetric:
 				#self.__graph.get_node_using_id(node_id).set_cluster_id(SHELL)
 			
 			# sort the L_primes, to find the first one that is in the first or the third cases.
+			new_Ls.sort(key= lambda x:x[3])
 			new_Ls.sort(key= lambda x:x[0], reverse=False)# makhraj kuchiktar olaviat bishtar
 			new_Ls.sort(key= lambda x:x[1], reverse=True)
 			finished = False
@@ -95,9 +97,9 @@ class LMetric:
 				#	print('No progress, The End!')
 				#	finished = True
 				#	break
-				if new_Ls[i][0]<L:
+				if new_Ls[i][0]<=L:
 					break
-				if new_Ls[i][1]>L_in:# case one and case 3
+				if new_Ls[i][1]>=L_in:# case one and case 3
 					community.add(new_Ls[i][3])# adding the node to the community
 					Shell.remove(new_Ls[i][3])
 					for node_id in self.__graph.get_node_using_id(new_Ls[i][3]).get_edges():
@@ -133,7 +135,8 @@ class LMetric:
 		org_l,org_l_in,org_l_ex = self.evaluate_community(cluster)
 		print('original values are:',org_l,org_l_in,org_l_ex)
 		to_be_removed = []
-		for node_id in cluster:
+		cluster_copy = copy.copy(cluster)
+		for node_id in cluster_copy:
 			# remove node_id from cluster
 			# and compute Lp_in and Lp_out
 			# compare with the L_in and L_out
@@ -141,14 +144,14 @@ class LMetric:
 			cluster.remove(node_id)
 			new_l,new_l_in,new_l_ex = self.evaluate_community(cluster)
 			print('original:',org_l,org_l_in,org_l_ex,'with removal of:',node_id,':',new_l,new_l_in,new_l_ex)
-			if (new_l_ex<org_l_ex):
+			if not(new_l_ex>=org_l_ex):# denom should get smaller and numerator
 				print('removing:',node_id,'ORG_IN:',org_l_in,'new_in:',new_l_in,'ORG_EX:',org_l_ex,'new_ex:',new_l_ex)
 				# must be removed, keeping its id to removing it at the end!
 				to_be_removed.append(node_id)
 			cluster.add(node_id)
-		for node_id in to_be_removed:
-			print('lets remove:',node_id,'ftom',cluster)
-			cluster.remove(node_id)
+		for node_id_ind in range(len(to_be_removed)):
+			print('lets remove:',to_be_removed[node_id_ind],'ftom',cluster)
+			cluster.remove(to_be_removed[node_id_ind])
 		print('these nodes are removed:',sorted(to_be_removed,key=lambda x:int(x)))
 		return cluster
 
@@ -175,8 +178,11 @@ class LMetric:
 		output_file = open(output_file_name,'a')
 		output_file.write('\n')
 		remaining = self.__graph.get_nodes()
+		#remaining = [ '28',  '34',  '24',  '30',  '27',  '9',  '31',  '33',  '2',  '3',  '4',  '8',  '14',  '32',  '29',  '26',  '25',  '5',  '6',  '7',  '11',  '17',  '1',  '12',  '13',  '18',  '20','22','10','16','15','19','23','21']
+		#remaining = remaining[::-1]
 		ind = 0
-		while True:
+		finished = False
+		while finished==False:
 			print('\t\tCurrent remaining:',remaining)
 			if ind>len(remaining):
 				print('reached the end!, terminating')
@@ -195,12 +201,31 @@ class LMetric:
 					if len(remaining)>0:
 						ind = int(remaining[0])
 					else:
-						return "FINISH!"
+						print( "FINISH!")
+						finished = True
+						break
 			else:
 				print('community does not exist since start node is not inside it.')
 				if len(remaining)>1:
 					ind +=1
 				else:
-					return "FINISH"
+					print( "FINISH")
+					finished = True
+					break
 		output_file.write('no Community:'+str(remaining)+'\n')
 		output_file.close()
+
+
+'''
+28 34 24 30 27
+9 31 33
+2 3 4 8 14
+32 29 26 25
+5 6 7 11 17
+1 12 13 18 20
+
+'''
+
+'''
+ '28',  '34',  '24',  '30',  '27',  '9',  '31',  '33',  '2',  '3',  '4',  '8',  '14',  '32',  '29',  '26',  '25',  '5',  '6',  '7',  '11',  '17',  '1',  '12',  '13',  '18',  '20', 
+ '''
