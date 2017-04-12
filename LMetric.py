@@ -107,6 +107,8 @@ class LMetric:
 				#	print('No progress, The End!')
 				#	finished = True
 				#	break
+				if new_Ls[i][0]<=L:
+					break
 				if new_Ls[i][1]>L_in:# case one and case 3
 					community.add(new_Ls[i][3])# adding the node to the community
 					Shell.remove(new_Ls[i][3])
@@ -118,8 +120,6 @@ class LMetric:
 					break
 					#print('case 2 for:',new_Ls[i][3])
 				#self.__graph.get_node_using_id(new_Ls[i][3]).set_cluster_id(BORDER)## border or core???
-				if new_Ls[i][0]<=L:
-					break
 				
 			if not added:
 				print('No progress, The End!')
