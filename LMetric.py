@@ -58,19 +58,7 @@ class LMetric:
 				count +=1
 		return count
 
-	def discovery_phase(self):
-		# getting id of the starting node from user
-		while True:	
-			temp = input('please provide id of a node of the graph: ')
-			if not temp.isnumeric():
-				print('Incorrect.')		
-				continue
-				#temp = int(temp)
-			if self.__graph.has_node(temp):
-				print('node with this ID is found!')
-				#self.__start_node_id = temp
-				n0 = self.__graph.get_node_using_id(temp)
-				break
+	def discovery_phase(self,n0):
 		# some initializations, including setting the starting node, adding to the community and getting the initial shell
 		n0.set_cluster_id(CORE)
 		community = set()
@@ -98,7 +86,7 @@ class LMetric:
 				#self.__graph.get_node_using_id(node_id).set_cluster_id(SHELL)
 			
 			# sort the L_primes, to find the first one that is in the first or the third cases.
-			#new_Ls.sort(key= lambda x:x[0], reverse=False)# makhraj kuchiktar olaviat bishtar
+			new_Ls.sort(key= lambda x:x[0], reverse=False)# makhraj kuchiktar olaviat bishtar
 			new_Ls.sort(key= lambda x:x[1], reverse=True)
 			finished = False
 			added = False
@@ -107,7 +95,7 @@ class LMetric:
 				#	print('No progress, The End!')
 				#	finished = True
 				#	break
-				if new_Ls[i][0]<=L:
+				if new_Ls[i][0]<L:
 					break
 				if new_Ls[i][1]>L_in:# case one and case 3
 					community.add(new_Ls[i][3])# adding the node to the community
@@ -159,6 +147,7 @@ class LMetric:
 				to_be_removed.append(node_id)
 			cluster.add(node_id)
 		for node_id in to_be_removed:
+			print('lets remove:',node_id,'ftom',cluster)
 			cluster.remove(node_id)
 		print('these nodes are removed:',sorted(to_be_removed,key=lambda x:int(x)))
 		return cluster
@@ -168,11 +157,50 @@ class LMetric:
 			return True
 		return False
 
-	def run_lmetric_algorithm(self):
-		community,start_node_id = self.discovery_phase()
-		#community_pruned = community
-		community_pruned = self.examination_phase(community)
-		if self.is_start_node_in_the_community(community_pruned,start_node_id):
-			print('community is:',sorted(community_pruned,key=lambda x:int(x)))
-		else:
-			print('community does not exist since start node is not inside it.')
+	def run_lmetric_algorithm(self,output_file_name):
+		'''
+		# getting id of the starting node from user
+		while True:	
+			temp = input('please provide id of a node of the graph: ')
+			if not temp.isnumeric():
+				print('Incorrect.')		
+				continue
+				#temp = int(temp)
+			if self.__graph.has_node(temp):
+				print('node with this ID is found!')
+				#self.__start_node_id = temp
+				n0 = self.__graph.get_node_using_id(temp)
+				break
+		'''
+		output_file = open(output_file_name,'a')
+		output_file.write('\n')
+		remaining = self.__graph.get_nodes()
+		ind = 0
+		while True:
+			print('\t\tCurrent remaining:',remaining)
+			if ind>len(remaining):
+				print('reached the end!, terminating')
+				break
+			n0 = self.__graph.get_node_using_id( remaining[ind])
+			community,start_node_id = self.discovery_phase(n0)
+			
+			#community_pruned = community
+			community_pruned = self.examination_phase(community)
+			if self.is_start_node_in_the_community(community_pruned,start_node_id):
+				print('community is:',sorted(community_pruned,key=lambda x:int(x)))
+				output_file.write('Community detected:'+str(sorted(community_pruned,key=lambda x:int(x)))+'\n')
+				for node_id in community:
+					self.__graph.remove_node(node_id)
+					del remaining[remaining.index(node_id)]
+					if len(remaining)>0:
+						ind = int(remaining[0])
+					else:
+						return "FINISH!"
+			else:
+				print('community does not exist since start node is not inside it.')
+				if len(remaining)>1:
+					ind +=1
+				else:
+					return "FINISH"
+		output_file.write('no Community:'+str(remaining)+'\n')
+		output_file.close()

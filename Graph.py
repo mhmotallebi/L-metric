@@ -32,16 +32,24 @@ class Graph:
 				self.__nodes[target].set_edges(source)
 
 	def remove_node(self,node_id):
-		if id not in self.__nodes:
+		print('****** current state of graph is:',self.__nodes)
+		node_id = str(node_id)
+		if node_id not in self.__nodes:
 			raise Exception('id to be removed was not found in the graph: ', node_id)
 		else:
-			self.__nodes[node_id] = None
+			neighbours = self.__nodes[node_id].get_edges()
+			for neighbour_id in neighbours:
+				self.__nodes[neighbour_id].remove_edge(node_id)
+			del self.__nodes[node_id]
 
 	def get_node_using_id(self,node_id):
 		if node_id not in self.__nodes:
 			raise Exception('id not found in the graph, in get_node_using_id:', node_id)
 		else:
 			return self.__nodes[node_id]
+
+	def get_nodes(self):
+		return sorted([key for (key,val) in self.__nodes.items()],key= lambda x:int(x))
 
 	def has_node(self, node_id):
 		if node_id in self.__nodes:

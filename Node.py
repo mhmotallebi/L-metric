@@ -17,6 +17,9 @@ class Node:
 	def get_edges(self):
 		return self.__edges
 
+	def remove_edge(self,id):
+		del self.__edges[self.__edges.index(id)]
+
 	def set_edges(self,edges):
 		if len(edges)==0:
 			return

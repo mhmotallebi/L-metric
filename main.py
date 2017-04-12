@@ -26,13 +26,14 @@ def create_graph(input_file_name):
 	return my_graph
 
 case=1
+output_file_name = 'out.3'
 if case==1:
 	input_file_name = '../karate/karate.gml'
 	my_g = create_graph(input_file_name)
 	print(my_g)
 	# now lets evaluate communities inside it.
 	lm = LMetric(my_g)
-	lm.run_lmetric_algorithm()
+	lm.run_lmetric_algorithm(output_file_name)
 
 
 elif case==2:
@@ -69,4 +70,4 @@ elif case==2:
 
 	print(g2)
 	lm = LMetric(g2)
-	lm.run_lmetric_algorithm()
+	lm.run_lmetric_algorithm(output_file_name)
