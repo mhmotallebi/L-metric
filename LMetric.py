@@ -178,13 +178,11 @@ class LMetric:
 		output_file = open(output_file_name,'a')
 		output_file.write('\n')
 		remaining = self.__graph.get_nodes()
-		#remaining = [ '28',  '34',  '24',  '30',  '27',  '9',  '31',  '33',  '2',  '3',  '4',  '8',  '14',  '32',  '29',  '26',  '25',  '5',  '6',  '7',  '11',  '17',  '1',  '12',  '13',  '18',  '20','22','10','16','15','19','23','21']
-		#remaining = remaining[::-1]
 		ind = 0
 		finished = False
 		while finished==False:
 			print('\t\tCurrent remaining:',remaining)
-			if ind>len(remaining):
+			if ind>=len(remaining):
 				print('reached the end!, terminating')
 				break
 			n0 = self.__graph.get_node_using_id( remaining[ind])
@@ -197,9 +195,11 @@ class LMetric:
 				output_file.write('Community detected:'+str(sorted(community_pruned,key=lambda x:int(x)))+'\n')
 				for node_id in community:
 					self.__graph.remove_node(node_id)
-					del remaining[remaining.index(node_id)]
-					if len(remaining)>0:
-						ind = int(remaining[0])
+					
+					if node_id in remaining:
+						del remaining[remaining.index(node_id)]	
+					#if len(remaining)>0:
+					#	ind = int(remaining[0])
 					else:
 						print( "FINISH!")
 						finished = True
@@ -215,17 +215,3 @@ class LMetric:
 		output_file.write('no Community:'+str(remaining)+'\n')
 		output_file.close()
 
-
-'''
-28 34 24 30 27
-9 31 33
-2 3 4 8 14
-32 29 26 25
-5 6 7 11 17
-1 12 13 18 20
-
-'''
-
-'''
- '28',  '34',  '24',  '30',  '27',  '9',  '31',  '33',  '2',  '3',  '4',  '8',  '14',  '32',  '29',  '26',  '25',  '5',  '6',  '7',  '11',  '17',  '1',  '12',  '13',  '18',  '20', 
- '''

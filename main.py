@@ -25,7 +25,7 @@ def create_graph(input_file_name):
 	input_file.close()
 	return my_graph
 
-case=1
+case=2
 output_file_name = 'out.3'
 if case==1:
 	input_file_name = '../karate/karate.gml'
